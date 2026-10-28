@@ -1,4 +1,4 @@
-# RSA File Vault — revisi modular (Python 3.8+)
+# RSA File Vault
 
 Proyek CLI akademik untuk membandingkan empat metode dekripsi:
 1. RSA standar
@@ -13,9 +13,6 @@ Proyek CLI akademik untuk membandingkan empat metode dekripsi:
 - `file_vault.py`: operasi file ciphertext JSON.
 - `benchmark.py`: pengukuran median waktu, iterasi individual, dan peak alokasi Python.
 - `test_rsa_core.py`: pengujian otomatis.
-
-## Menjalankan
-Dibuat agar kompatibel dengan Python 3.8+ dan hanya memakai standard library.
 
 ```bash
 python main.py
