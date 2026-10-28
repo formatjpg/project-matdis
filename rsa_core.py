@@ -65,24 +65,35 @@ def generate_prime(bits: int) -> int:
         if is_probable_prime(candidate):
             return candidate
 
+
 def generate_keypair(modulus_bits: int = 512):
     """
-    Membuat RSA key pair eksperimen.
-    modulus_bits adalah target perkiraan ukuran n; gunakan bilangan genap.
-    Default 512-bit TIDAK aman untuk penggunaan nyata.
+    Membuat RSA key pair untuk eksperimen akademik.
+    Ukuran modulus n dipastikan tepat sesuai modulus_bits.
+    Implementasi ini tidak aman untuk penggunaan nyata.
     """
     if modulus_bits < 128 or modulus_bits % 2:
-        raise ValueError("Gunakan modulus_bits genap dan minimal 128 untuk eksperimen.")
+        raise ValueError(
+            "Gunakan modulus_bits genap dan minimal 128 untuk eksperimen."
+        )
+
     prime_bits = modulus_bits // 2
     e = 65537
 
     while True:
         p = generate_prime(prime_bits)
         q = generate_prime(prime_bits)
+
         if p == q:
             continue
+
         n = p * q
+
+        if n.bit_length() != modulus_bits:
+            continue
+
         phi = (p - 1) * (q - 1)
+
         if gcd(e, phi) == 1:
             break
 
@@ -93,11 +104,17 @@ def generate_keypair(modulus_bits: int = 512):
 
     public_key = {"n": n, "e": e}
     private_key = {
-        "n": n, "d": d, "p": p, "q": q,
-        "dP": d_p, "dQ": d_q, "q_inv": q_inv,
+        "n": n,
+        "d": d,
+        "p": p,
+        "q": q,
+        "dP": d_p,
+        "dQ": d_q,
+        "q_inv": q_inv,
         "e": e,
     }
     return public_key, private_key
+
 
 def encrypt_bytes(plaintext: bytes, public_key: dict) -> list[int]:
     """
