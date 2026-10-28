@@ -1,0 +1,11 @@
+RSA File Vault merupakan proyek eksperimen akademik yang bertujuan mempelajari penerapan algoritma RSA dalam proses enkripsi dan dekripsi berkas. 
+Proyek ini membandingkan empat metode, yaitu RSA Standar, RSA dengan Chinese Remainder Theorem (CRT), RSA dengan Blinding, serta RSA dengan kombinasi CRT dan Blinding.
+Setiap metode memiliki karakteristik yang berbeda. 
+RSA Standar digunakan sebagai metode pembanding dasar. 
+CRT bertujuan mempercepat operasi dekripsi, sedangkan Blinding digunakan untuk membantu mengurangi risiko kebocoran informasi melalui efek samping komputasi tertentu. 
+Kombinasi CRT dan Blinding diharapkan memberikan keseimbangan antara performa dan mitigasi serangan side-channel.
+Pengujian dilakukan dengan menggunakan berkas masukan yang sama dan membandingkan waktu eksekusi, penggunaan memori Python, serta validitas hasil dekripsi. 
+Hasil pengujian tidak hanya dilihat dari metode yang paling cepat, tetapi juga dari kompromi antara efisiensi komputasi dan mekanisme mitigasi keamanan.
+Proyek ini merupakan prototipe untuk pembelajaran Matematika Diskrit dan kriptografi. 
+Hasil pengujian digunakan untuk memahami operasi perpangkatan modular, penerapan CRT, serta pengaruh penambahan Blinding terhadap performa algoritma RSA. 
+Implementasi ini ditujukan untuk eksperimen akademik dan bukan untuk melindungi data rahasia dalam penggunaan nyata.

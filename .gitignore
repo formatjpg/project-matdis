@@ -1,0 +1,22 @@
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Editor dan sistem operasi
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Hasil pengujian
+.pytest_cache/
+.coverage
+htmlcov/
