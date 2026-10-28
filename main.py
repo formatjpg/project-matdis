@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 from rsa_core import generate_keypair, METHODS
@@ -19,6 +20,18 @@ from file_vault import (
 from benchmark import benchmark_methods
 
 DEFAULT_KEY_FILE = str(Path(__file__).resolve().parent / "rsa_key.json")
+
+
+def unique_key_file_path(prefix: str = "rsa_key") -> Path:
+    """Buat path JSON unik tanpa menimpa file kunci yang sudah ada."""
+    key_dir = Path(DEFAULT_KEY_FILE).resolve().parent
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    candidate = key_dir / f"{prefix}_{timestamp}.json"
+    counter = 1
+    while candidate.exists():
+        candidate = key_dir / f"{prefix}_{timestamp}_{counter}.json"
+        counter += 1
+    return candidate
 
 class UI:
     """Warna ANSI sederhana; otomatis nonaktif bila terminal tidak mendukungnya."""
@@ -308,16 +321,25 @@ def main() -> None:
                     if bits >= 128 and bits % 2 == 0:
                         break
                     error("Ukuran modulus harus genap dan minimal 128 bit.")
+                    
+                old_key_path = unique_key_file_path("rsa_key_backup")
+                backup_path = save_keys(public_key, private_key, str(old_key_path))
+                backup_path = str(Path(backup_path).resolve())
+                success("Kunci aktif sebelumnya diamankan")
+                print("    Backup kunci lama: " + backup_path)
+
                 start = time.perf_counter()
                 new_public, new_private = generate_keypair(bits)
                 elapsed = (time.perf_counter() - start) * 1000
-                saved_path = save_keys(new_public, new_private, DEFAULT_KEY_FILE)
+                new_key_path = unique_key_file_path()
+                saved_path = save_keys(new_public, new_private, str(new_key_path))
                 public_key, private_key = new_public, new_private
                 key_path = str(Path(saved_path).resolve())
-                success("Pasangan kunci baru berhasil dibuat")
-                print("    File kunci : " + key_path)
-                print("    Ukuran     : {} bit".format(public_key["n"].bit_length()))
-                print("    Durasi     : {:.3f} ms".format(elapsed))
+                success("Pasangan kunci baru berhasil dibuat dan disimpan")
+                print("    File kunci baru: " + key_path)
+                print("    Ukuran         : {} bit".format(public_key["n"].bit_length()))
+                print("    Durasi         : {:.3f} ms".format(elapsed))
+                info("Untuk mendekripsi file lama, pilih menu 5 lalu muat file backup kunci lama di atas.")
                 warning("Kunci demo ini tidak ditujukan untuk melindungi data sungguhan.")
 
             elif choice == "5":

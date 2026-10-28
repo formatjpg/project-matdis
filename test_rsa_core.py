@@ -43,6 +43,17 @@ class RSACoreTests(unittest.TestCase):
             decrypt_file(str(root / "lorem.enc.json"), str(out), self.private_key, "d")
             self.assertEqual(out.read_bytes(), self.plaintext)
 
+    def test_decryption_rejects_wrong_key_for_new_ciphertext(self):
+        wrong_public, wrong_private = generate_keypair(256)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            original = root / "lorem.txt"
+            original.write_bytes(self.plaintext)
+            encrypted = root / "lorem.enc.json"
+            encrypt_file(str(original), str(encrypted), self.public_key)
+            with self.assertRaisesRegex(ValueError, "Kunci aktif tidak cocok"):
+                decrypt_file(str(encrypted), str(root / "wrong.txt"), wrong_private, "d")
+
     def test_output_names_get_expected_extensions(self):
         self.assertTrue(normalize_output_path("lorem", ".enc.json").endswith("lorem.enc.json"))
         self.assertTrue(normalize_output_path("lorem.enc.json", ".enc.json").endswith("lorem.enc.json"))

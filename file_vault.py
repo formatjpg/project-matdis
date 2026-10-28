@@ -2,10 +2,16 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 from rsa_core import encrypt_bytes, METHODS
 
 FORMAT_NAME = "RSA-EDUCATIONAL-DEMO-1"
+
+def key_fingerprint(key: dict) -> str:
+    """Sidik jari publik untuk mendeteksi kunci yang tidak cocok."""
+    material = f"{int(key['n'])}:{int(key['e'])}".encode("ascii")
+    return hashlib.sha256(material).hexdigest()
 
 def resolve_input_path(input_path: str, expected_suffix: str) -> Path:
     """Terima nama file tanpa ekstensi atau ekstensi yang memang diharapkan."""
@@ -52,9 +58,9 @@ def encrypt_file(input_path: str, output_path: str, public_key: dict) -> int:
     ciphertext = encrypt_bytes(data, public_key)
     payload = {
         "format": FORMAT_NAME,
-        # Textbook RSA tanpa padding hanya untuk eksperimen akademik.
         "original_name": source.name,
         "original_size_bytes": len(data),
+        "key_fingerprint": key_fingerprint(public_key),
         "ciphertext": ciphertext,
     }
     destination = Path(output_path).expanduser()
@@ -78,7 +84,15 @@ def read_ciphertext_file(input_path: str) -> tuple[list[int], dict]:
 def decrypt_file(input_path: str, output_path: str, private_key: dict, method_key: str) -> int:
     if method_key not in METHODS:
         raise ValueError("Metode dekripsi tidak dikenal.")
-    ciphertext, _ = read_ciphertext_file(input_path)
+    ciphertext, payload = read_ciphertext_file(input_path)
+    expected_fingerprint = payload.get("key_fingerprint")
+    if expected_fingerprint:
+        active_fingerprint = key_fingerprint(private_key)
+        if active_fingerprint != expected_fingerprint:
+            raise ValueError(
+                "Kunci aktif tidak cocok dengan file terenkripsi. "
+                "Muat pasangan kunci yang digunakan saat enkripsi melalui menu 5."
+            )
     _, decrypt_function = METHODS[method_key]
     plaintext = decrypt_function(ciphertext, private_key)
     destination = Path(output_path).expanduser()
